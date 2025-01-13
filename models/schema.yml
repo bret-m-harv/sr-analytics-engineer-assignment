@@ -1,0 +1,60 @@
+version: 2
+
+seeds:
+  - name: datahub_entities_raw
+    description: >
+      Seed table with raw data from a fictional DataHub implementation. Each row represents a relationship 
+      between a DataHub Entity and an Aspect. A single Entity can have multiple records.
+      This should only be used for reference for those who are intersted in understanding the raw data used to create `stg_datahub_entities`.
+      Assume this dataset is updated daily.
+    columns:
+      - name: urn
+        description: "Unique identifier for the DataHub Entity."
+      - name: aspect
+        description: "Specific Aspect or relationship associated with the Entity."
+      - name: metadata
+        description: "JSON metadata containing details about the Entity and Aspect."
+      - name: createdon
+        description: "Timestamp indicating when the record was created."
+      - name: createdby
+        description: "Identifier of the User or process that created the record."
+
+models:
+  - name: stg_datahub_entities
+    description: >
+      Staging table built on top of `datahub_entities_raw`, raw data from a fictional DataHub implementation. Each record represents an Entity and its relationships to Domains, Glossary Terms, and Owners where relevant.
+    columns:
+      - name: urn
+        description: "Unique identifier for the DataHub Entity."
+        tests:
+          - unique
+          - not_null
+      - name: entity_type
+        description: "Type of DataHub Entity. Datasets and Dashboards represent external Data Entities that have been ingested into DataHub. Domains and Glossary Terms are created and maintained in DataHub, used to organize and govern Data Entities. Users in DataHub can be assigned as Owners of Data Entities."
+        tests:
+          - accepted_values:
+              values: ['dataset', 'dashboard', 'domain', 'glossary_term', 'user']
+      - name: entity_details
+        description: "Detailed JSON metadata about the Entity."
+      - name: entity_created_at
+        description: "Timestamp indicating when the Entity was created."
+      - name: entity_created_by
+        description: "Identifier of the User or process that created the Entity."
+      - name: domains
+        description: "Domain assigned to the Dataset/Dashboard, used to represent organizational ownership of data assets, i.e. Finance, Marketing, Sales. Only one Domain can be assigned at any given time, but assignment can change over time. Domains cannot be assigned to Gossary Terms or Users."
+      - name: domains_added_at
+        description: "Timestamp when the Domain was associated with the Entity."
+      - name: domains_added_by
+        description: "Identifier of the User or process that added the Domain."
+      - name: glossary_terms
+        description: "List of Glossary Terms associated with the Dataset/Dashboard. Glossary Terms represent agreed-upon definitions of key business terms, helping with consistency in how metrics and dimensions are defined across data assets. There is no limit to the number of Terms that can be assigned to an Entity; Terms can be added and removed over time. Terms cannot be assigned to Domains or Users"
+      - name: glossary_terms_added_at
+        description: "Timestamp when Glossary Terms were associated with the Entity."
+      - name: glossary_terms_added_by
+        description: "Identifier of the User or process that added Glossary Terms."
+      - name: owners
+        description: "List of Users and their Ownership Type associated with the Dataset/Dashboard. There is no limit to the number of Owners that can be assigned; a single User can be assigned to multiple Ownership Types. Owners can be added or removed over time. Owners cannot be assigned to Domains or Glossary Terms."
+      - name: owners_added_at
+        description: "Timestamp when Owners were associated with the Entity."
+      - name: owners_added_by
+        description: "Identifier of the User or process that added Owners."
