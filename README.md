@@ -15,7 +15,7 @@ It contains two parts:
 2. **Data Modeling:** Design a collection of data models on top of the staging table to support a wide range of analytical use cases.
 
 Your submission should include:
-- Forked GitHub repo with fully reproducible code
+- Your Forked GitHub repo with fully reproducible code for Parts 1 & 2 
 - Comprehensive documentation covering your approach, assumptions, tradeoffs, and open questions
 
 Please keep in mind the following:
@@ -70,13 +70,13 @@ Once you have successfully compiled & built the project, take some time to get f
 
 Within your GitHub Fork, create a pull request with improvements to the 3 files in the `analyses/` directory, focusing on the following:
 
-1. **Logic Accuracy:** Ensure the query logic accurately generates output to address the questions listed at the beginning of the file; update the baseline query output if necessary.
+1. **Logic Accuracy:** Ensure the query logic accurately generates output to address the questions listed at the beginning of each file; update the baseline query output if necessary.
 2. **Consistency & Readability:** Suggest changes to improve consistency and readability of logic across all three files.
 3. **Communication:** Explain why you are proposing the changes within your PR; add code comments inline where you feel they add value.
 
 ## Part 2: Analytical Data Model Design
 
-Now that you are familiar with the underlying data and sample use cases, design a set of reusable data models based on `stg_datahub_entities` to address analytical needs and enable broader insights. Your models should:
+Now that you are familiar with the underlying data and sample use cases, design a set of reusable dbt models built on top of `stg_datahub_entities` to address analytical needs and enable broader insights. Your models should:
 
 1. **Support Existing Analyses**: Build models to answer questions from the `analyses` directory:
    - Domains assigned to Datasets/Dashboards, their descriptions, and count of assigned entities.
