@@ -76,11 +76,11 @@ Within your GitHub Fork, create a pull request with improvements to the 3 files 
 
 ## Part 2: Analytical Data Model Design
 
-Design a set of reusable data models based on `stg_datahub_entities` to address analytical needs and enable broader insights. Your models should:
+Now that you are familiar with the underlying data and sample use cases, design a set of reusable data models based on `stg_datahub_entities` to address analytical needs and enable broader insights. Your models should:
 
 1. **Support Existing Analyses**: Build models to answer questions from the `analyses` directory:
    - Domains assigned to Datasets/Dashboards, their descriptions, and count of assigned entities.
-   - Glossary Terms applied to Datasets/Dashboards and their counts.
+   - Glossary Terms applied to Datasets/Dashboards and count of assigned entities.
    - Owners assigned to Datasets/Dashboards, their job titles, and ownership counts.
 
 2. **Focus on Usability and Deeper Insights**: Build models that are intuitive, easy to drill into, and designed for iteration, with clear field names and consistent structure. These models should facilitate analysis of intersections and relationships across **Domains**, **Ownership**, and **Glossary Terms**, such as:
