@@ -76,7 +76,7 @@ Within your GitHub Fork, create a pull request with improvements to the 3 files 
 
 ## Part 2: Analytical Data Model Design
 
-Now that you are familiar with the underlying data and sample use cases, design a set of reusable dbt models built on top of `stg_datahub_entities` to address analytical needs and enable broader insights. Your models should:
+Now that you are familiar with the underlying data and sample use cases, design a set of reusable dbt models built on top of `stg_datahub_entities` to address analytical needs and enable broader insights. These models can be merged directly into `main` or submitted as a Pull Request. Your models should:
 
 1. **Support Existing Analyses**: Build models to answer questions from the `analyses` directory:
    - Domains assigned to Datasets/Dashboards, their descriptions, and count of assigned entities.
