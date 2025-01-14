@@ -12,7 +12,7 @@ This assignment simulates the work you'll do as the first Senior Analytics Engin
 It contains two parts:
 
 1. **Code Review:** Provide a code review of 3 SQL queries in the `/analyses` directory.
-2. **Data Modeling:** Design a collection of data models on top of the staging table to support a wide range of analytical use cases.
+2. **Data Modeling:** Design a collection of data models on top of the staging table to support a set of analytical use cases.
 
 Your submission should include:
 - Your Forked GitHub repo with executable SQL code for Parts 1 & 2, designed to run against the provided DuckDB database.  
@@ -29,7 +29,7 @@ Your submission should include:
 
 ## Part 0: Get Familiar with the dbt Project
 
-Here are the relevent files for this exercise:
+Here are the relevant files for this exercise:
 
 - `seeds/datahub_entities_raw.csv`: A seed file representing DataHub's raw data model.
   - **NOTE:** We do not expect you to develop resources directly on top of this seed file, but you are welcome to use this to import data into a datastore other than the DuckDB database provided if you choose to do so.
@@ -47,13 +47,12 @@ Take time to explore the contents and documentation for `stg_datahub_entities` t
 Within your GitHub Fork, create a pull request with improvements to the 3 files in the `analyses/` directory, focusing on the following:
 
 1. **Logic Accuracy:** Ensure the query logic accurately generates output to address the questions listed at the beginning of each file; update the baseline query output if necessary.
-2. **Consistency & Readability:** Suggest changes to improve consistency and readability of logic across all three files.
+2. **Consistency & Readability:** Suggest changes to improve the consistency and readability of logic across all three files.
 3. **Communication:** Explain why you are proposing the changes within your PR; add code comments inline where you feel they add value.
-
 
 ## Part 2: Analytical Data Model Design
 
-Now that you are familiar with the underlying data and sample use cases, choose **one use case** from the `analyses` directory and design a set of reusable dbt models built on top of `stg_datahub_entities` to address that analytical need. These models can be merged directly into `main` or submitted as a Pull Request. Models must be executable within the provided DuckDB database. If you choose to use a different datastore, include detailed steps to reproduce your work outside of DuckDB.
+Now that you are familiar with the underlying data and sample use cases, choose **one use case** from the `analyses` directory and design a set of reusable dbt models built on top of `stg_datahub_entities` to address that analytical need. These models can be merged directly into `main` or submitted as a Pull Request within your GitHub Fork. Models must be executable within the provided DuckDB database. If you choose to use a different datastore, include detailed steps to reproduce your work outside of DuckDB.
 
 Your task involves the following:
 
@@ -62,10 +61,10 @@ Your task involves the following:
    - **OR** Glossary Terms applied to Datasets/Dashboards and count of assigned entities.
    - **OR** Owners assigned to Datasets/Dashboards, their job titles, and ownership counts.
 
-2. **Design Layered Models**: Create a set of dbt models to support this use case that clearly separate concerns across the following areas:
-   - **Data Cleanup/Normalization**: Models that clean and normalize raw data, ensuring consistency and quality.
-   - **Ad-hoc Query Layer**: Intermediate models designed for SQL-savvy analysts to conduct flexible, exploratory analysis.
-   - **Reporting/Presentation Layer**: Final models optimized for reporting and consumption by less technical stakeholders.
+2. **Design Data Models**: Create a set of dbt models to support the questions presented in the use case, ensuring you support the following use cases:
+   - **Data Cleanup/Normalization**: Model(s) that clean and normalize raw data, ensuring consistency and quality.
+   - **Ad-hoc Query Layer**: Model(s) designed for SQL-savvy analysts to conduct flexible, exploratory analysis.
+   - **Reporting/Presentation Layer**: Final model(s) optimized for reporting and consumption by less technical stakeholders.
 
 3. **Provide Documentation**: Include two types of documentation for your models:  
 
