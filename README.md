@@ -15,8 +15,9 @@ It contains two parts:
 2. **Data Modeling:** Design a collection of data models on top of the staging table to support a set of analytical use cases.
 
 Your submission should include:
-- Your Forked GitHub repo with executable SQL code for Parts 1 & 2, designed to run against the provided DuckDB database.  
-- A pull request demonstrating feedback and improvements for Part 1.  
+- Your Forked GitHub repo with executable SQL code for Parts 1 & 2, designed to run against the provided DuckDB database.
+  - **NOTE:** You are welcome to make the repository private and grant appropriate access to `maggiehays` once you are ready to submit.
+- A pull request demonstrating feedback and improvements for Part 1.
 - Representative dbt-style models for Part 2 that showcase how you would structure the project.
 - Comprehensive documentation covering your approach, assumptions, trade-offs, and open questions.
 
@@ -49,6 +50,10 @@ Within your GitHub Fork, create a pull request with improvements to the 3 files 
 1. **Logic Accuracy:** Ensure the query logic accurately generates output to address the questions listed at the beginning of each file; update the baseline query output if necessary.
 2. **Consistency & Readability:** Suggest changes to improve the consistency and readability of logic across all three files.
 3. **Communication:** Explain why you are proposing the changes within your PR; add code comments inline where you feel they add value.
+
+**NOTE:** Ensure you publish a pull request against your fork, NOT the `acryldata` repository:
+
+![](imgs/pr-against-fork.png)
 
 ## Part 2: Analytical Data Model Design
 
