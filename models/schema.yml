@@ -230,7 +230,7 @@ models:
   # ---------------------------------------------------------------------------
   #  DATA VAULT: LINK
   # ---------------------------------------------------------------------------
-  - name: lnk_domain_entities
+  - name: lnk_domains_entities
     description: >
       Data Vault Link capturing many-to-many relationships between domains and 
       entities. Each row represents a single (domain_hk, entity_hk) pair derived 
@@ -256,7 +256,7 @@ models:
   # ---------------------------------------------------------------------------
   #  MART
   # ---------------------------------------------------------------------------
-  - name: mrt_domain_usage
+  - name: mrt_domain_analysis
     description: >
       Final reporting (mart) model showing domain usage across datasets/dashboards. 
       Provides counts of how many entities belong to each domain, along with the 
