@@ -3,9 +3,11 @@ version: 2
 seeds:
   - name: datahub_entities_raw
     description: >
-      Seed table with raw data from a fictional DataHub implementation. Each row represents a relationship 
-      between a DataHub Entity and an Aspect. A single Entity can have multiple records.
-      This should only be used for reference for those who are intersted in understanding the raw data used to create `stg_datahub_entities`.
+      Seed table with raw data from a fictional DataHub implementation. Each row 
+      represents a relationship between a DataHub Entity and an Aspect. A single Entity 
+      can have multiple records.
+      This should only be used for reference for those who are intersted in understanding 
+      the raw data used to create `stg_datahub_entities`.
       Assume this dataset is updated daily.
     columns:
       - name: urn
@@ -20,9 +22,14 @@ seeds:
         description: "Identifier of the User or process that created the record."
 
 models:
+  # ---------------------------------------------------------------------------
+  #  STAGING
+  # ---------------------------------------------------------------------------
   - name: stg_datahub_entities
     description: >
-      Staging table built on top of `datahub_entities_raw`, raw data from a fictional DataHub implementation. Each record represents an Entity and its relationships to Domains, Glossary Terms, and Owners where relevant.
+      Staging table built on top of `datahub_entities_raw`, raw data from a fictional 
+      DataHub implementation. Each record represents an Entity and its relationships 
+      to Domains, Glossary Terms, and Owners where relevant.
     columns:
       - name: urn
         description: "Unique identifier for the DataHub Entity."
@@ -30,7 +37,11 @@ models:
           - unique
           - not_null
       - name: entity_type
-        description: "Type of DataHub Entity. Datasets and Dashboards represent external Data Entities that have been ingested into DataHub. Domains and Glossary Terms are created and maintained in DataHub, used to organize and govern Data Entities. Users in DataHub can be assigned as Owners of Data Entities."
+        description: >
+          Type of DataHub Entity. Datasets and Dashboards represent external Data 
+          Entities that have been ingested into DataHub. Domains and Glossary Terms 
+          are created and maintained in DataHub, used to organize and govern Data Entities. 
+          Users in DataHub can be assigned as Owners of Data Entities.
         tests:
           - accepted_values:
               values: ['dataset', 'dashboard', 'domain', 'glossary_term', 'user']
@@ -41,20 +52,223 @@ models:
       - name: entity_created_by
         description: "Identifier of the User or process that created the Entity."
       - name: domains
-        description: "Domain assigned to the Dataset/Dashboard, used to represent organizational ownership of data assets, i.e. Finance, Marketing, Sales. Only one Domain can be assigned at any given time, but assignment can change over time. Domains cannot be assigned to Gossary Terms or Users."
+        description: >
+          Domain assigned to the Dataset/Dashboard, used to represent organizational 
+          ownership of data assets, i.e. Finance, Marketing, Sales. Only one Domain 
+          can be assigned at any given time, but assignment can change over time. 
+          Domains cannot be assigned to Gossary Terms or Users.
       - name: domains_added_at
         description: "Timestamp when the Domain was associated with the Entity."
       - name: domains_added_by
         description: "Identifier of the User or process that added the Domain."
       - name: glossary_terms
-        description: "List of Glossary Terms associated with the Dataset/Dashboard. Glossary Terms represent agreed-upon definitions of key business terms, helping with consistency in how metrics and dimensions are defined across data assets. There is no limit to the number of Terms that can be assigned to an Entity; Terms can be added and removed over time. Terms cannot be assigned to Domains or Users"
+        description: >
+          List of Glossary Terms associated with the Dataset/Dashboard. Glossary Terms 
+          represent agreed-upon definitions of key business terms, helping with 
+          consistency in how metrics and dimensions are defined across data assets. 
+          There is no limit to the number of Terms that can be assigned to an Entity; 
+          Terms can be added and removed over time. Terms cannot be assigned to Domains or Users.
       - name: glossary_terms_added_at
         description: "Timestamp when Glossary Terms were associated with the Entity."
       - name: glossary_terms_added_by
         description: "Identifier of the User or process that added Glossary Terms."
       - name: owners
-        description: "List of Users and their Ownership Type associated with the Dataset/Dashboard. There is no limit to the number of Owners that can be assigned; a single User can be assigned to multiple Ownership Types. Owners can be added or removed over time. Owners cannot be assigned to Domains or Glossary Terms."
+        description: >
+          List of Users and their Ownership Type associated with the Dataset/Dashboard. 
+          There is no limit to the number of Owners that can be assigned; a single User can 
+          be assigned to multiple Ownership Types. Owners can be added or removed over time. 
+          Owners cannot be assigned to Domains or Glossary Terms.
       - name: owners_added_at
         description: "Timestamp when Owners were associated with the Entity."
       - name: owners_added_by
         description: "Identifier of the User or process that added Owners."
+
+  # ---------------------------------------------------------------------------
+  #  RAW VAULT (INT) LAYER
+  # ---------------------------------------------------------------------------
+  - name: rv_cleaned_domains
+    description: >
+      Intermediate model extracting only Entities where entity_type = 'domain'. 
+      Pulls the domain's name, description, and creation metadata from JSON fields.
+    columns:
+      - name: domain_urn
+        description: "Unique domain identifier (natural key)."
+        tests:
+          - not_null
+      - name: domain_name
+        description: "Human-readable domain name parsed from the JSON metadata."
+      - name: domain_description
+        description: "Short description of the domain's purpose or scope."
+      - name: domain_created_at
+        description: "Timestamp when the domain was created in DataHub."
+      - name: domain_created_by
+        description: "Identifier of the User/process that created the domain."
+
+  - name: rv_cleaned_entities
+    description: >
+      Intermediate model focusing on 'dataset' and 'dashboard' Entities. 
+      Extracts key fields (e.g. entity_name, platform) from JSON metadata and 
+      retains JSON references to domains.
+    columns:
+      - name: entity_urn
+        description: "Unique entity identifier (natural key)."
+        tests:
+          - not_null
+      - name: entity_type
+        description: "Either 'dataset' or 'dashboard' for this model."
+      - name: entity_name
+        description: "Human-readable name, extracted from JSON metadata."
+      - name: platform
+        description: "Origin or platform reference (e.g. 'bigquery', 'looker')."
+      - name: origin
+        description: "Specifies environment or data region info if available."
+      - name: domains
+        description: "JSON array listing domain URNs assigned to this Entity."
+      - name: entity_created_at
+        description: "Timestamp when the entity was created."
+      - name: entity_created_by
+        description: "Identifier of the User/process that created the entity."
+
+  # ---------------------------------------------------------------------------
+  #  DATA VAULT: HUBS
+  # ---------------------------------------------------------------------------
+  - name: hub_domains
+    description: >
+      Data Vault Hub for domain entities. Each record represents a unique domain 
+      identified by domain_nk (the domain_urn).
+    columns:
+      - name: domain_hk
+        description: >
+          Surrogate key for the domain (hash of domain_nk). 
+          This is the primary key for this hub.
+        tests:
+          - unique
+          - not_null
+      - name: domain_nk
+        description: "Natural key (domain_urn) for the domain."
+        tests:
+          - not_null
+      - name: load_date
+        description: "Timestamp when the row was loaded into the Hub."
+      - name: record_source
+        description: "Identifier of the data source or pipeline stage."
+
+  - name: hub_entities
+    description: >
+      Data Vault Hub for dataset or dashboard entities. Each record has a unique 
+      entity_hk (hash of entity_nk), referencing the entity URN as the natural key.
+    columns:
+      - name: entity_hk
+        description: "Surrogate key for the entity (hash of entity_urn)."
+        tests:
+          - unique
+          - not_null
+      - name: entity_nk
+        description: "Natural key for the entity (the entity_urn)."
+        tests:
+          - not_null
+      - name: load_date
+        description: "Timestamp when the row was loaded into the Hub."
+      - name: record_source
+        description: "Identifier of the data source or pipeline stage."
+
+  # ---------------------------------------------------------------------------
+  #  DATA VAULT: SATELLITES
+  # ---------------------------------------------------------------------------
+  - name: sat_domains
+    description: >
+      Satellite table holding descriptive attributes of each domain. 
+      Linked to hub_domains by domain_hk.
+    columns:
+      - name: domain_hk
+        description: "FK referencing hub_domains.domain_hk."
+        tests:
+          - relationships:
+              to: 'hub_domains'
+              field: domain_hk
+      - name: domain_name
+        description: "Name of the domain (parsed from JSON)."
+      - name: domain_description
+        description: "Description of the domain (parsed from JSON)."
+      - name: domain_created_at
+        description: "Timestamp when the domain was created in DataHub."
+      - name: domain_created_by
+        description: "Identifier of the User/process that created the domain."
+      - name: load_date
+        description: "Timestamp when the row was loaded into the Satellite."
+      - name: record_source
+        description: "Identifier of the data source or pipeline stage."
+
+  - name: sat_entities
+    description: >
+      Satellite table for dataset/dashboard descriptive attributes. 
+      Linked to h_entities by entity_hk.
+    columns:
+      - name: entity_hk
+        description: "FK referencing hub_entities.entity_hk."
+        tests:
+          - relationships:
+              to: 'hub_entities'
+              field: entity_hk
+      - name: entity_type
+        description: "Indicates if this record is a dataset or a dashboard."
+      - name: entity_name
+        description: "Human-readable name for the dataset/dashboard."
+      - name: platform
+        description: "Platform or system in which the dataset/dashboard resides."
+      - name: origin
+        description: "Environment or location reference for the entity."
+      - name: entity_created_at
+        description: "Timestamp when the entity was created."
+      - name: entity_created_by
+        description: "Identifier of the User/process that created the entity."
+      - name: load_date
+        description: "Timestamp when the row was loaded into the Satellite."
+      - name: record_source
+        description: "Identifier of the data source or pipeline stage."
+
+  # ---------------------------------------------------------------------------
+  #  DATA VAULT: LINK
+  # ---------------------------------------------------------------------------
+  - name: lnk_domain_entities
+    description: >
+      Data Vault Link capturing many-to-many relationships between domains and 
+      entities. Each row represents a single (domain_hk, entity_hk) pair derived 
+      from flattening JSON references in int_clean_entities.domains.
+    columns:
+      - name: domain_hk
+        description: "FK referencing h_domains.domain_hk."
+        tests:
+          - relationships:
+              to: 'hub_domains'
+              field: domain_hk
+      - name: entity_hk
+        description: "FK referencing h_entities.entity_hk."
+        tests:
+          - relationships:
+              to: 'hub_entities'
+              field: entity_hk
+      - name: load_date
+        description: "Timestamp when the row was loaded into the Link."
+      - name: record_source
+        description: "Identifier of the data source or pipeline stage."
+
+  # ---------------------------------------------------------------------------
+  #  MART
+  # ---------------------------------------------------------------------------
+  - name: mrt_domain_usage
+    description: >
+      Final reporting (mart) model showing domain usage across datasets/dashboards. 
+      Provides counts of how many entities belong to each domain, along with the 
+      domain name/description.
+    columns:
+      - name: domain_hk
+        description: "FK referencing h_domains.domain_hk."
+      - name: domain_name
+        description: "Domain name, from s_domains."
+      - name: domain_description
+        description: "Domain description, from s_domains."
+      - name: total_entities
+        description: "Number of distinct datasets/dashboards associated with this domain."
+      - name: usage_rank
+        description: "Rank (descending) of domains by total_entities (1 = most used)."
